@@ -111,4 +111,4 @@ function customerTotal(quantity, price) {
     customerStart();
 }
 
-connection.end();
+//connection.end();

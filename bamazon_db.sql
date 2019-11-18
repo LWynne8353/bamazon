@@ -13,15 +13,6 @@ stock_quantity INT (100),
 PRIMARY KEY (id)
 );
 
---CREATE TABLE managertable(
---id INT AUTO_INCREMENT NOT NULL,
---product_name VARCHAR(250) NOT NULL,
---department_name VARCHAR(250) NOT NULL,
---price DECIMAL (10 , 2),
---stock_quantity INT (100),
---PRIMARY KEY (id)
---);
-
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("freezer", "appliances", 2000.00, 5);
 INSERT INTO products (product_name, department_name, price, stock_quantity)

@@ -1,25 +1,25 @@
-// var mysql = require("mysql");
-// var inquirer = require("inquirer");
+var mysql = require("mysql");
+var inquirer = require("inquirer");
 
-// var connection = mysql.createConnection({
-//     host: "localhost",
+var connection = mysql.createConnection({
+    host: "localhost",
 
-//     // Your port; if not 3306
-//     port: 3306,
+    // Your port; if not 3306
+    port: 3306,
 
-//     // Your username
-//     user: "root",
+    // Your username
+    user: "root",
 
-//     // Your password
-//     password: "penn",
-//     database: "bamazon_DB"
-// });
+    // Your password
+    password: "penn",
+    database: "bamazon_DB"
+});
 
-// connection.connect(function (err) {
-//     if (err) throw err;
-//     console.log("connected as id " + connection.threadId + "\n");
-//     managerMenu();
-// });
+connection.connect(function (err) {
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId + "\n");
+    managerMenu();
+});
 
 function managerMenu() {
     var query = "SELECT * FROM products";
@@ -43,24 +43,24 @@ function managerOptions(products) {
                     managerMenu();
                     break;
                 case "view low inventory":
-                    checkLowInventory();
+                    checkLowInventory()
                     break;
 
                 case "add to inventory":
-                    addInventory(products);
+                    addInventory(products)
                     break;
 
                 case "add to product":
-                    createNewProduct(products);
+                    createNewProduct(products)
                     break;
                 default:
-                    console.log("Session End");
+                    console.log("Session End")
                     connection.end();
                     break
             }
         });
 }
-function checkLowInventory(products){
+function checkLowInventory(products) {
     var query = "SELECT * FROM products WHERE stock_quantity <= 5 ";
     connection.query(query, function (err, res) {
         if (err) throw err;
@@ -68,25 +68,25 @@ function checkLowInventory(products){
         managerMenu();
     });
 }
-function addInventory(products){
+function addInventory(products) {
     inquirer
-    .prompt({
-        name: "choice",
-        type: "input",
-        message: "What product id would you like?"
-    }).then(function (answer) {
-        var id = parseInt(answer.choice);
-        var product = checkInventory(id, inventory);
-        if (product) {
-            //create function to prompt the customer for quantity 
-            promptManagerForQuantity(product)
-        } else {
-            console.log("Item is not inventory");
-            managerMenu();
-        }
-    });
+        .prompt({
+            name: "choice",
+            type: "input",
+            message: "What product id would you like?"
+        }).then(function (answer) {
+            var id = parseInt(answer.choice);
+            var product = checkInventory(id, inventory);
+            if (product) {
+                //create function to prompt the customer for quantity 
+                promptManagerForQuantity(product)
+            } else {
+                console.log("Item is not inventory");
+                managerMenu();
+            }
+        });
 }
-    
+
 //check inventory to see if item is in stock 
 function checkInventory(id, inventory) {
     console.log(id)
@@ -104,8 +104,65 @@ function promptManagerForQuantity(product) {
         .prompt({
             name: "quantity",
             type: "input",
-            message: "How many would you like?"
+            message: "How many would you like to add?"
         }).then(function (value) {
-            var quantity = parseInt(value.quantity)
+            quantity = parseInt(value.quantity)
         });
+}
+function addQuantity(product, quantity) {
+    connection.query("UPDATE PRODUCTS SET stock_quantity = stock_quantity + ? WHERE id = ?",
+        [quantity, product.id],
+        function (err, res) {
+            console.log("Inventory Numbers Have Updated")
+            //connection.end();
+            managerMenu();
+        })
+}
+function createNewProduct(products){
+inquirer
+    .prompt([
+        {
+            name: "product",
+            type: "input",
+            message: "What is your new product?"
+        },
+        {
+            name: "department",
+            type: "input",
+            message: "What department does below too?"
+        },
+        {
+            name: "price",
+            type: "input",
+            message: "What is the cost of the products"
+        },
+        {
+            name: "stock",
+            type: "input",
+            message: "How many do we have for stock?",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                }
+                return false;
+            }
+        }
+    ])
+    .then(function (answer) {
+        // when finished prompting, insert a new item into the db with that info
+        connection.query(
+            "INSERT INTO products SET ?",
+            {
+                product_name: answer.product,
+                department_name: answer.department,
+                price: answer.price || 0,
+                stock_quantity: answer.stock || 0
+            },
+            function (err) {
+                if (err) throw err;
+                console.log("Product has been added to the inventory!");
+                managerMenu();
+            }
+        );
+    });
 }
