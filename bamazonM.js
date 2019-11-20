@@ -100,22 +100,17 @@ function addInventory() {
                                 console.log("Item has been updated")
                                 managerMenu();
 
-
+                            
                             }
-            }
+                        }
                         console.log(answer.choice);
                         console.log(answer.number)
-
-
-
-
-
                         // var query = "UPDATE PRODUCTS SET product_id = stock_quantity + ?";{
                         // connection.query = (query, function (err, res) {
                         //     if (err) throw err;
                         //     console.log("Item has been updated")
                         //     managerMenu();
-                    })
+                    });
 
     })
 }
