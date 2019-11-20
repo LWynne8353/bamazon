@@ -74,95 +74,69 @@ function addInventory(products) {
             name: "choice",
             type: "input",
             message: "What product id would you like?"
-        }).then(function (answer) {
-            var id = parseInt(answer.choice);
-            var product = checkInventory(id, inventory);
-            if (product) {
-                //create function to prompt the customer for quantity 
-                promptManagerForQuantity(product)
-            } else {
-                console.log("Item is not inventory");
-                managerMenu();
-            }
-        });
-}
-
-//check inventory to see if item is in stock 
-function checkInventory(id, inventory) {
-    console.log(id)
-    for (var i = 0; i < inventory.length; i++) {
-        if (inventory[i].id === id) {
-            // console.log(inventory[i])
-            return inventory[i];
-        }
-    }
-    return null;
-}
-function promptManagerForQuantity(product) {
-    // console.log("Enter quantity")
-    inquirer
-        .prompt({
-            name: "quantity",
-            type: "input",
-            message: "How many would you like to add?"
-        }).then(function (value) {
-            quantity = parseInt(value.quantity)
-        });
-}
-function addQuantity(product, quantity) {
-    connection.query("UPDATE PRODUCTS SET stock_quantity = stock_quantity + ? WHERE id = ?",
-        [quantity, product.id],
-        function (err, res) {
-            console.log("Inventory Numbers Have Updated")
-            //connection.end();
-            managerMenu();
-        })
-}
-function createNewProduct(products){
-inquirer
-    .prompt([
-        {
-            name: "product",
-            type: "input",
-            message: "What is your new product?"
         },
-        {
-            name: "department",
-            type: "input",
-            message: "What department does below too?"
-        },
-        {
-            name: "price",
-            type: "input",
-            message: "What is the cost of the products"
-        },
-        {
-            name: "stock",
-            type: "input",
-            message: "How many do we have for stock?",
-            validate: function (value) {
-                if (isNaN(value) === false) {
-                    return true;
-                }
-                return false;
-            }
-        }
-    ])
-    .then(function (answer) {
-        // when finished prompting, insert a new item into the db with that info
-        connection.query(
-            "INSERT INTO products SET ?",
             {
-                product_name: answer.product,
-                department_name: answer.department,
-                price: answer.price || 0,
-                stock_quantity: answer.stock || 0
+                name: "quantity",
+                type: "input",
+                message: "How many would you like to add?"
+
+            }).then(function (answer) {
+                var answer = parseInt(answer.choice);
+                connection.query("UPDATE PRODUCTS SET product_name + ? WHERE stock_quantity ?",
+                    {
+                    function (err) {
+                        if (err) throw err;
+                        console.log("Inventory has be updated");
+                        managerMenu();
+                    },
+                    });
             },
-            function (err) {
-                if (err) throw err;
-                console.log("Product has been added to the inventory!");
-                managerMenu();
-            }
-        );
-    });
+                function createNewProduct(products) {
+                    inquirer
+                        .prompt([
+                            {
+                                name: "product",
+                                type: "input",
+                                message: "What is your new product?"
+                            },
+                            {
+                                name: "department",
+                                type: "input",
+                                message: "What department does below too?"
+                            },
+                            {
+                                name: "price",
+                                type: "input",
+                                message: "What is the cost of the products"
+                            },
+                            {
+                                name: "stock",
+                                type: "input",
+                                message: "How many do we have for stock?",
+                                validate: function (value) {
+                                    if (isNaN(value) === false) {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            }
+                        ])
+                        .then(function (answer) {
+                            // when finished prompting, insert a new item into the db with that info
+                            connection.query(
+                                "INSERT INTO products SET ?",
+                                {
+                                    product_name: answer.product,
+                                    department_name: answer.department,
+                                    price: answer.price || 0,
+                                    stock_quantity: answer.stock || 0
+                                },
+                                function (err) {
+                                    if (err) throw err;
+                                    console.log("Product has been added to the inventory!");
+                                    managerMenu();
+                                }
+                            )
+                        });
+                })
 }
